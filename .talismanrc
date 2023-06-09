@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: nginx.conf
+  checksum: 8de2bf0e5d8ba937daeac7577c5903f689255371e404c4efa1b30724a745b90b
+version: ""
