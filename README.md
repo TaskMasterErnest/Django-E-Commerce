@@ -1,26 +1,10 @@
-# E-Commerce Project For Baby Tools
-### TECHNOLOGIES
-- Python
-- Django
-- Venv
+# Containerizing the application
 
+The application has been configured to be containerized via the config in the `Dockerfile`.
 
-### Photos
+Clone the repository if you want && run the command `docker build -f Dockerfile -t django-app .` 
 
-##### Home Page with login
-<img alt="" src="https://github.com/MET-DEV/Django-E-Commerce/blob/master/project_images/capture_20220323080815407.jpg"></img>
-##### Home Page with filter
-<img alt="" src="https://github.com/MET-DEV/Django-E-Commerce/blob/master/project_images/capture_20220323080840305.jpg"></img>
-##### Product Detail Page
-<img alt="" src="https://github.com/MET-DEV/Django-E-Commerce/blob/master/project_images/capture_20220323080934541.jpg"></img>
+<!-- If you do not want to clone the repo, download the container using the `docker pull ernestklu/django-e-commerce:v1` command. -->
 
-##### Home Page with no login
-<img alt="" src="https://github.com/MET-DEV/Django-E-Commerce/blob/master/project_images/capture_20220323080953570.jpg"></img>
-
-
-##### Register Page
-<img alt="" src="https://github.com/MET-DEV/Django-E-Commerce/blob/master/project_images/capture_20220323081016022.jpg"></img>
-
-
-##### Login Page
-<img alt="" src="https://github.com/MET-DEV/Django-E-Commerce/blob/master/project_images/capture_20220323081044867.jpg"></img>
+There is a `Dockerfile.prod`, which is an attempt at creating a production-ready container.
+There is more work to be done to get it ready.
