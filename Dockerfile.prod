@@ -1,51 +1,48 @@
-# Stage 1: Build Stage
-FROM python:3.11-alpine AS builder
-
+## build stage
+FROM python:3.11-alpine as builder
+# create a workdir
 WORKDIR /app
+# in this project, no additional tool is needed to install the requirements
+# RUN apt-gt updates -y && apt-get install -y --no-recommends gcc
 
-# copy the files over 
-COPY . .
+# Copy over the data from the files
+COPY babyshop-app/ .
+COPY requirements.txt .
 
-# Copy and install Python dependencies
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Use wheels to install the requirements, with no cache directory, no dependencies
+RUN pip install --no-cache-dir --user -r requirements.txt && \
+    python manage.py collectstatic --noinput && \
+    pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
+# Collect the static images 
+# RUN python manage.py collectstatic --no-input
 
-# Stage 2: Production Stage
+# I want to enter the shell at this point
 FROM python:3.11-alpine
 
-# Install Nginx
-RUN apk update && apk add --no-cache nginx
+# install nginx
+RUN apk update && \
+    apk add --no-cache nginx && \
+    rm /etc/nginx/http.d/default.conf
 
-# Remove default Nginx configuration
-RUN rm /etc/nginx/http.d/default.conf
-
-# Copy Nginx configuration
-COPY nginx.conf /etc/nginx/http.d
-
-# Copy static files from the build stage
-COPY --from=builder /app/static /usr/share/nginx/html
-
-# Set working directory to /app in the second stage
+# Start a workdir
 WORKDIR /app
 
-# copy the relevant files
-COPY --from=builder /app/manage.py /app/manage.py
-COPY --from=builder /app/babyshop /app/babyshop
-COPY --from=builder /app/templates /app/templates
-COPY --from=builder /app/static /app/static
-COPY --from=builder /app/users /app/users
-COPY --from=builder /app/products /app/products
+# Copy over the files needed
+COPY --from=builder /app/ /app
+#COPY --from=builder /app/static /usr/share/nginx/html
 
-# Copy the requirements and install them again
-COPY --from=builder /app/requirements.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+# Copy over the nginx configuration to the conf destinations
+#COPY nginx.conf /etc/nginx/http.d
+#COPY /static /usr/share/nginx/html
 
-# initialize the database
-RUN python manage.py migrate
+# Install the wheels
+RUN cp nginx.conf /etc/nginx/http.d && \
+    mv static/ /usr/share/nginx/html && \
+    pip install --no-cache /app/wheels/* && \
+    python manage.py migrate
 
-# Expose port 80 for Nginx
+# EXPOSE A PORT
 EXPOSE 8080
 
 # Start Nginx and run the Django application
